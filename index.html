@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Juros Compostos</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Topo / Cabeçalho -->
+        <header class="header">
+            <div class="badge">Educação Financeira</div>
+            <h1>Simulador de Juros Compostos</h1>
+            <p class="subtitle">Descubra o poder do efeito "bola de neve" no crescimento do seu dinheiro ao longo do tempo.</p>
+        </header>
+
+        <!-- Seção de Descrição e Funcionamento -->
+        <section class="info-section card">
+            <h2>Como Funciona o Simulador?</h2>
+            
+            <div class="info-grid">
+                <div class="info-block">
+                    <div class="icon">🎯</div>
+                    <h3>Objetivo do Simulador</h3>
+                    <p>
+                        Esta ferramenta projeta o crescimento do seu patrimônio com base no conceito de <strong>juros compostos</strong>, onde os rendimentos de cada mês são incorporados ao capital inicial para gerar novos juros nos meses seguintes ("juros sobre juros").
+                    </p>
+                </div>
+
+                <div class="info-block">
+                    <div class="icon">💡</div>
+                    <h3>Exemplos Reais de Uso</h3>
+                    <ul>
+                        <li><strong>Reserva Financeira:</strong> Aportes mensais com foco em segurança e liquidez.</li>
+                        <li><strong>Aposentadoria / Independência:</strong> Construção de patrimônio no longo prazo (15 a 30 anos).</li>
+                        <li><strong>Planos de Médio Prazo:</strong> Compra de um veículo, viagem dos sonhos ou entrada de imóvel (3 a 5 anos).</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Botões de Exemplo Prático -->
+            <div class="presets-container">
+                <span class="presets-title">Clique para testar um cenário pronto:</span>
+                <div class="preset-buttons">
+                    <button type="button" class="btn-preset" onclick="carregarExemplo('reserva')">🛡️ Reserva de Emergência</button>
+                    <button type="button" class="btn-preset" onclick="carregarExemplo('aposentadoria')">🚀 Aposentadoria (20 anos)</button>
+                    <button type="button" class="btn-preset" onclick="carregarExemplo('carro')">🚗 Meta de 3 Anos</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Formulário de Dados de Entrada -->
+        <section class="calculator-section card">
+            <h2>Dados de Entrada</h2>
+            <form id="simulatorForm" onsubmit="calcularSimulacao(event)">
+                <div class="form-grid">
+                    <!-- Valor Inicial -->
+                    <div class="form-group">
+                        <label for="valorInicial">Valor Inicial (R$)</label>
+                        <input type="number" id="valorInicial" step="0.01" min="0" placeholder="Ex: 1000.00" required>
+                    </div>
+
+                    <!-- Investimento Mensal -->
+                    <div class="form-group">
+                        <label for="investimentoMensal">Investimento Mensal / Aporte (R$)</label>
+                        <input type="number" id="investimentoMensal" step="0.01" min="0" placeholder="Ex: 300.00" required>
+                    </div>
+
+                    <!-- Taxa de Juros -->
+                    <div class="form-group">
+                        <label for="taxaJuros">Taxa de Juros (%)</label>
+                        <div class="input-with-select">
+                            <input type="number" id="taxaJuros" step="0.01" min="0" placeholder="Ex: 0.8" required>
+                            <select id="tipoTaxa">
+                                <option value="mensal" selected>a.m. (Mensal)</option>
+                                <option value="anual">a.a. (Anual)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Período -->
+                    <div class="form-group">
+                        <label for="periodo">Período</label>
+                        <div class="input-with-select">
+                            <input type="number" id="periodo" min="1" step="1" placeholder="Ex: 12" required>
+                            <select id="unidadePeriodo">
+                                <option value="meses" selected>Meses</option>
+                                <option value="anos">Anos</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Calcular</button>
+                    <button type="button" class="btn btn-secondary" onclick="limparSimulacao()">Limpar</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Resultados e Totais -->
+        <section id="resultsSection" class="results-section card hidden">
+            <h2>Resultado da Simulação</h2>
+            
+            <div class="totals-grid">
+                <div class="total-card highlight-final">
+                    <span class="total-label">Valor Total Final</span>
+                    <span class="total-value" id="totalFinal">R$ 0,00</span>
+                </div>
+                <div class="total-card">
+                    <span class="total-label">Valor Total Investido</span>
+                    <span class="total-value" id="totalInvestido">R$ 0,00</span>
+                </div>
+                <div class="total-card highlight-juros">
+                    <span class="total-label">Total em Juros</span>
+                    <span class="total-value" id="totalJuros">R$ 0,00</span>
+                </div>
+            </div>
+
+            <!-- Tabela Mês a Mês -->
+            <div class="table-container">
+                <h3>Detalhamento Mês a Mês</h3>
+                <div class="table-wrapper">
+                    <table id="tabelaSimulacao">
+                        <thead>
+                            <tr>
+                                <th>Mês</th>
+                                <th>Juros do Mês</th>
+                                <th>Total Investido</th>
+                                <th>Juros Acumulados</th>
+                                <th>Valor Acumulado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaCorpo">
+                            <!-- Linhas inseridas dinamicamente via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
